@@ -1,0 +1,15 @@
+ORG 1000H
+MSJ DB "CONCEPTOS DE "
+DB "ARQUITECTURA DE COMPUTADORAS-"
+DB "FACULTAD DE INFORMATICA-"
+DB 55H
+DB 4EH
+DB 4CH
+DB 50H
+FIN DB ?
+ORG 2000H
+MOV BX, OFFSET MSJ ;muevo a bx la direccion de memoria de donde quiero empezara a escribir
+MOV AL, OFFSET FIN-OFFSET MSJ ;en al pongo la cantidad de caracteres que quiero que escribaz
+INT 7
+INT 0
+END

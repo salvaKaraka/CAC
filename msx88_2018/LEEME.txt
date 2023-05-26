@@ -1,0 +1,31 @@
+MSX88 para Windows
+------------------
+
+Este es una versión beta del port de MSX88 para Windows.
+
+- Esta versión tiene incorporadas todas las caracteristicas de la versión 4, eso incluye como 
+     novedad importante el USART y el modo cronogramas.
+
+- Con la Tecla F8 pasamos de pantalla en ventana a Pantalla Completa!
+
+- Se calibro el comando de velocidad. Hay que ver:
+   - Rapido muy rápido.
+   - Lento muy lento.
+   - Velocidad media es aceptable.
+
+Problemas/limitaciones conocidos:
+
+ - Puede haber problemas con algunos textos, en pantalla completa sobre todo ya que
+    se escala la pantalla.
+ 
+ - Al apretar ALT, no cambia la ayuda abajo indicando las combinaciones 
+   validas.
+   
+ - Algunas combinaciones de teclas pueden generar una entrada extraña en la linea de comandos.
+ 
+
+
+- Recordar que es una versión de pruebas, si encuentran algo más, por favor avisar.
+
+
+

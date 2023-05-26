@@ -1,0 +1,83 @@
+CONT         EQU 10H
+COMP         EQU 11H
+EOI          EQU 20H
+IMR          EQU 21H
+IRR          EQU 22H ; son registros no programables
+ISR          EQU 23H ; los dejo para recordar su eexistencia
+
+INT1         EQU 25H
+
+PA           EQU 30H
+PB           EQU 31H
+CA           EQU 32H
+CB           EQU 33H
+ 
+ORG 44; ID de la interrupcion 11 * 4
+             DW  GEST_CLK   
+
+
+ORG 1000H
+ LUCES DB 0
+ DIRECCION DB 1
+
+org 3000H
+ 
+ GEST_CLK:   PUSH AX
+             MOV AL, 0
+    
+             CMP DIRECCION, 1
+             JZ FORWARD
+             
+ DIVIDIR:    INC AL
+             SUB LUCES, 2
+             JNZ DIVIDIR
+             
+             MOV LUCES, AL
+             CMP LUCES, 1
+             JNZ PRENDER
+             MOV DIRECCION, 1
+             JMP PRENDER
+ 
+ INICIALIZAR: MOV LUCES, 1
+              JMP PRENDER
+ 
+ FORWARD:    MOV AL, LUCES
+             ADD LUCES, AL
+             JZ  INICIALIZAR
+             CMP LUCES, 80H
+             JNZ PRENDER
+             MOV DIRECCION, 0
+             
+ PRENDER:    MOV AL, LUCES
+             OUT PB, AL
+             
+             MOV AL, 0   ; Regreso el contador del timer a 0
+             OUT CONT, AL
+             
+             MOV AL, EOI ; Cargo EOI con el valor 20H quee es la instruccion 
+             OUT EOI, AL ; para que EOI termine la interrupcion
+             POP AX
+             IRET
+
+ORG 2000H
+             CLI; Pauso las INT
+             
+             MOV AL, 0FCH ; Enmascaro con 11111100
+             OUT IMR, AL
+             
+             MOV AL, 11; Le asigno una ID a mi INT 1
+             OUT INT1, AL
+             
+             MOV AL, 1; Le asigno un modulo de 1 al registro COMP del timer
+             OUT COMP, AL
+             
+             MOV AL,0; Seteo a 0 al registro Contador del timer
+             OUT CONT, AL
+             OUT CB, AL
+             OUT PB, AL
+             
+             STI; Reanudo las INT
+             
+ LAZO:       JMP LAZO
+
+END

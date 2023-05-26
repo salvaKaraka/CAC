@@ -1,0 +1,62 @@
+PA EQU 30H    ; Calcula los primeros 10 números
+PB EQU 31H 
+CA EQU 32H
+CB EQU 33H
+
+ORG 1000h
+            STR DB "HOLA MUNDO"
+
+ORG 3000H
+       
+ PIO_SETUP: MOV AL, 1
+            OUT CA, AL
+            
+            MOV AL, 0
+            OUT CB, AL
+            RET
+            
+            
+ CONSULTA_DE_ESTADO: IN AL, PA
+            AND AL, 1
+            JNZ CONSULTA_DE_ESTADO  
+            RET
+
+ STROBE0:   IN AL, PA
+            AND AL, 0FDH
+            OUT PA, AL
+            RET
+            
+ STROBE1:   IN AL, PA
+            OR AL, 02H
+            OUT PA, AL    
+            RET
+
+ORG 2000h
+            MOV BX, OFFSET STR
+            MOV CL, 10 
+            
+            PUSH AX
+            CALL PIO_SETUP
+            POP AX
+            
+ BUCLE:     PUSH AX
+            CALL CONSULTA_DE_ESTADO
+            POP AX
+
+
+            MOV AL, [BX]
+            OUT PB, AL
+            
+            PUSH AX
+            CALL STROBE0
+            POP AX
+            
+            PUSH AX
+            CALL STROBE1
+            POP AX
+            
+            INC BX
+            DEC CL
+            JNZ BUCLE
+INT 0
+END

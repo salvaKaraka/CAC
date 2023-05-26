@@ -1,0 +1,86 @@
+CONT         EQU 10H
+COMP         EQU 11H
+EOI          EQU 20H
+IMR          EQU 21H
+IRR          EQU 22H ; son registros no programables
+ISR          EQU 23H ; los dejo para recordar su eexistencia
+INT0         EQU 24H
+INT1         EQU 25H
+
+ORG 40; ID de la interrupcion 10 * 4
+             DW  GEST_F10   
+
+ 
+ORG 44; ID de la interrupcion 11 * 4
+             DW  GEST_CLK   
+
+
+ORG 1000H
+ SEGD DB 30H
+ SEGU DB 30H
+ DB 09H
+ FIN DB ?
+
+
+org 3000H
+
+ GEST_F10:   PUSH AX  ;Guardo el fvalor de los registros
+             
+             IN AL, IMR
+             XOR AL, 2H
+             OUT IMR, AL        ; Enmascaro el TIMER
+            
+             MOV AL, EOI ; Cargo EOI con el valor 20H que es la instruccion 
+             OUT EOI, AL ; para que EOI termine la interrupcion
+
+             POP AX  ;Restauro el valor de los registros
+             IRET
+ 
+ GEST_CLK:   PUSH AX
+             INC SEGU
+             CMP SEGU, 3AH
+             JNZ IMPRIMIR
+             MOV SEGU, 30H
+             INC SEGD
+             CMP SEGD, 33H
+             JNZ IMPRIMIR
+             PUSH AX
+             MOV AL, 0FFH
+             OUT IMR, AL
+             POP AX
+ IMPRIMIR:   INT 7
+             
+             MOV AL, 0   ; Regreso el contador del timer a 0
+             OUT CONT, AL
+             
+             MOV AL, EOI ; Cargo EOI con el valor 20H quee es la instruccion 
+             OUT EOI, AL ; para que EOI termine la interrupcion
+             POP AX
+             IRET
+
+ORG 2000H
+             CLI; Pauso las INT
+             
+             MOV AL, 0FCH ; Enmascaro con 11111100
+             OUT IMR, AL
+ 
+             MOV AL, 10; Le asigno una ID arbitraria a mi INT0
+             OUT INT0, AL
+             
+             MOV AL, 11; Le asigno una ID a mi INT 1
+             OUT INT1, AL
+             
+             MOV AL, 1; Le asigno un modulo de 1 al registro COMP del timer
+             OUT COMP, AL
+             
+             MOV AL,0; Seteo a 0 al registro Contador del timer
+             OUT CONT, AL
+             
+             MOV BX, OFFSET SEGD
+             MOV AX, OFFSET FIN - OFFSET SEGD
+             
+             STI; Reanudo las INT
+             
+ LAZO:       JMP LAZO
+
+END

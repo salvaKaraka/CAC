@@ -1,0 +1,62 @@
+ORG 1000H
+  MSJ DB 0AH
+  DB "INGRESE EL PRIMER NUMERO:"
+  MSJ2 DB 0AH
+  DB "INGRESE EL SEGUNDO NUMERO:"
+  RESULTADO DB ?
+ORG 1500H
+  NUM DB ?
+  NUM2 DB ?
+
+ORG 3000H
+    SUMA: MOV BX, OFFSET RESULTADO
+          SUB DL, 30H
+          SUB DH, 30H
+          ADD DL, DH
+          MOV DH, 00H
+    DIVI: INC DH
+          SUB DL, 10
+          JNS DIVI
+          DEC DH
+          ADD DL, 3AH
+          ADD DH, 30H
+          MOV [BX], DH
+          INC BX
+          MOV [BX], DL
+          DEC BX
+          MOV AL, 2
+          INT 7
+          RET
+
+ORG 2000H
+  
+  MOV BX, OFFSET MSJ
+  MOV AL, OFFSET MSJ2 - OFFSET MSJ
+  INT 7 ;imprime le mensaje
+  MOV BX, OFFSET NUM ;mueve a bx la direccion de la variable donde se va a guardar el numero leido por teclado
+  INT 6 ;llama a la interrupcion de lectura
+  
+  MOV DL, [BX]
+  
+  MOV BX, OFFSET MSJ2
+  MOV AL, OFFSET RESULTADO - OFFSET MSJ2
+  INT 7 ;imprime le mensaje
+  MOV BX, OFFSET NUM2 ;mueve a bx la direccion de la variable donde se va a guardar el numero leido por teclado
+  INT 6 ;llama a la interrupcion de lectura
+  
+  MOV DH, [BX]
+  
+  PUSH AX
+  PUSH BX
+  PUSH CX
+  PUSH DX
+  
+  CALL SUMA
+
+  POP DX
+  POP CX
+  POP BX
+  POP AX
+
+INT 0
+END

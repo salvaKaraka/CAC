@@ -1,0 +1,73 @@
+ORG 1000H
+  MSJ DB 0AH
+  DB "INGRESE LA CLAVE DE 4 DIGITOS:"
+  CLAVE DB "GUII"
+  MSJ2 DB "ACCESO PERMITIDO"
+  MSJ3 DB "ACCESO DENEGADO"
+  FIN DB ?
+ORG 1500H
+  INTENTO DB ?
+
+ORG 3000H
+   VERIF: MOV CL, 4
+          MOV CH, 0
+          MOV BX, OFFSET INTENTO
+          MOV DL, [BX]
+          PUSH BX
+          MOV BX, OFFSET CLAVE
+   BUCLE: CMP DL, [BX]
+          JNZ SIG
+          INC CH
+     SIG: PUSH BX
+          ADD SP, 2
+          POP BX
+          SUB SP, 2
+          INC BX
+          MOV DL, [BX]
+          PUSH BX
+          ADD SP, 2
+          POP BX
+          SUB SP, 2
+          INC BX
+          DEC CL
+          JNZ BUCLE
+          CMP CH, 4
+          JNZ DEN
+          MOV BX, OFFSET MSJ2
+          MOV AL, OFFSET MSJ3 - OFFSET MSJ2
+          INT 7
+          RET
+     DEN: MOV BX, OFFSET MSJ3
+          MOV AL, OFFSET FIN - OFFSET MSJ3
+          INT 7
+          RET
+
+ORG 2000H
+  
+  MOV BX, OFFSET MSJ
+  MOV AL, OFFSET CLAVE - OFFSET MSJ
+  INT 7 ;imprime le mensaje
+  
+  MOV BX, OFFSET INTENTO ;mueve a bx la direccion de la variable donde se va a guardar el numero leido por teclado
+  INT 6 ;llama a la interrupcion de lectura
+  INC BX
+  INT 6 ;llama a la interrupcion de lectura
+  INC BX
+  INT 6 ;llama a la interrupcion de lectura
+  INC BX
+  INT 6 ;llama a la interrupcion de lectura
+  
+  PUSH AX
+  PUSH BX
+  PUSH CX
+  PUSH DX
+  
+  CALL VERIF
+
+  POP DX
+  POP CX
+  POP BX
+  POP AX
+
+INT 0
+END

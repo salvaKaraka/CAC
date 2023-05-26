@@ -1,0 +1,102 @@
+CONT         EQU 10H
+COMP         EQU 11H
+EOI          EQU 20H
+IMR          EQU 21H
+IRR          EQU 22H ; son registros no programables
+ISR          EQU 23H ; los dejo para recordar su eexistencia
+INT0         EQU 24H
+INT1         EQU 25H
+
+ORG 40; ID de la interrupcion 10 * 4
+             DW  GEST_F10   
+
+ 
+ORG 44; ID de la interrupcion 11 * 4
+             DW  GEST_CLK   
+
+
+ORG 1000H
+ MSJ DB "INGRESE UN NUMERO: "
+ MSJ2 DB "PRESIONE F10 PARA INICIAR CUENTA REGRESIVA"
+ DB 09H
+ FIN DB ?
+ FLAG DB 0H
+ 
+ORG 1500H
+ NUM DB ?
+ 
+org 3000H
+
+ GEST_F10:   PUSH AX  ;Guardo el fvalor de los registros
+             
+             MOV FLAG,1
+             
+             MOV AL, 0FDH
+             OUT IMR, AL
+             
+             MOV AL, EOI ; Cargo EOI con el valor 20H quee es la instruccion 
+             OUT EOI, AL ; para que EOI termine la interrupcion
+             
+             POP AX  ;Restauro el valor de los registros
+             IRET
+ 
+ GEST_CLK:   PUSH AX
+             CMP FLAG, 1
+             JNZ FIN_INT
+             DEC BYTE PTR[BX]
+             CMP BYTE PTR[BX], 30H
+             JNZ IMPRIMIR
+             PUSH AX
+             MOV AL, 0FFH
+             OUT IMR, AL
+             POP AX
+ IMPRIMIR:   INT 7
+             
+ FIN_INT:    MOV AL, 0   ; Regreso el contador del timer a 0
+             OUT CONT, AL
+             
+             MOV AL, EOI ; Cargo EOI con el valor 20H quee es la instruccion 
+             OUT EOI, AL ; para que EOI termine la interrupcion
+             POP AX
+             IRET
+
+ORG 2000H
+             CLI; Pauso las INT
+             
+             MOV AL, 0FCH ; Enmascaro con 11111100
+             OUT IMR, AL
+ 
+             MOV AL, 10; Le asigno una ID arbitraria a mi INT0
+             OUT INT0, AL
+             
+             MOV AL, 11; Le asigno una ID a mi INT 1
+             OUT INT1, AL
+             
+             MOV AL,0; Seteo a 0 al registro Contador del timer
+             OUT CONT, AL
+             
+             MOV AL, 1; Le asigno un modulo de 1 al registro COMP del timer
+             OUT COMP, AL
+             
+             MOV BX, OFFSET MSJ
+             MOV AX, OFFSET MSJ2 - OFFSET MSJ
+             INT 7
+             
+             MOV BX, OFFSET NUM
+             INT 6
+             PUSH BX
+             
+             MOV BX, OFFSET MSJ2
+             MOV AX, OFFSET FIN - OFFSET MSJ2
+             INT 7
+             
+             POP BX
+             INC BYTE PTR[BX]
+             MOV AL, 1
+             
+             STI; Reanudo las INT
+             
+ LAZO:       JMP LAZO
+ 
+INT 0 
+END

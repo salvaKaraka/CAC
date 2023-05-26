@@ -1,0 +1,58 @@
+		ORG 1000H
+  MSJ DB 0AH
+  DB "INGRESE UN NUMERO:"
+  INICIO DB "------"
+  CERO DB "CERO--"
+  UNO DB "UNO---"
+  DOS DB "DOS---"
+  TRES DB "TRES--"
+  CUATRO DB "CUATRO"
+  CINCO DB "CINCO-"
+  SEIS DB "SEIS--"
+  SIETE DB "SIETE-"
+  OCHO DB "OCHO--"
+  NUEVE DB "NUEVE-"
+
+ORG 1500H
+  NUM DB ?
+
+ORG 3000H
+  NUMEROS: MOV CL, 00H
+    BUCLE: MOV BX, OFFSET MSJ
+           MOV AL, OFFSET INICIO - OFFSET MSJ
+           INT 7 ;imprime le mensaje
+           MOV BX, OFFSET NUM ;mueve a bx la direccion de la variable donde se va a guardar el numero leido por teclado
+           INT 6 ;llama a la interrupcion de lectura
+           MOV DL, [BX]
+           SUB DL, 2FH
+           MOV DH, DL
+           SUB DH, 01H
+           MOV BX, OFFSET INICIO
+     MULT: ADD BX, 6H
+           DEC DL
+           JNZ MULT
+           MOV AL, 6H
+           INT 7
+           CMP DH, 00H
+           JNZ NUMEROS
+           INC CL
+           CMP CL, 01H
+           JZ BUCLE
+           RET
+
+ORG 2000H
+
+  PUSH AX
+  PUSH BX
+  PUSH CX
+  PUSH DX
+  
+  CALL NUMEROS
+
+  POP DX
+  POP CX
+  POP BX
+  POP AX
+
+INT 0
+END

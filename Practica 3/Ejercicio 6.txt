@@ -1,0 +1,105 @@
+PA EQU 30H
+PB EQU 31H 
+CA EQU 32H
+CB EQU 33H
+
+EOI EQU 20H
+IMR EQU 21H
+INT0 EQU 24H
+
+ORG 40
+ DW GEST_F10
+
+ORG 1000H
+ MSJ DB "INGRESE LOS CARACTERES A IMPRIMIR Y PULSE F10:"
+ FIN DB ?
+
+ORG 1500H
+            STR DB ?
+
+ORG 3000H
+  
+ GEST_F10:  PUSH AX
+            PUSH BX
+            PUSH CX
+            MOV BX, OFFSET STR
+ BUCLE:     CALL CONSULTA_DE_ESTADO
+
+            MOV AL, [BX]
+            OUT PB, AL
+ 
+            CALL STROBE0
+ 
+            CALL STROBE1
+ 
+            INC BX
+            DEC CL
+            JNZ BUCLE
+            
+            MOV AL, EOI
+            OUT EOI, AL
+            POP CX
+            POP BX
+            POP AX
+            IRET
+       
+ PIO_SETUP: PUSH AX
+            MOV AL, 1
+            OUT CA, AL
+            
+            MOV AL, 0
+            OUT CB, AL
+            POP AX
+            RET
+            
+            
+ CONSULTA_DE_ESTADO: PUSH AX
+            IN AL, PA
+            AND AL, 1
+            JNZ CONSULTA_DE_ESTADO  
+            POP AX
+            RET
+
+ STROBE0:   PUSH AX
+            IN AL, PA
+            AND AL, 0FDH
+            OUT PA, AL
+            POP AX
+            RET
+            
+ STROBE1:   PUSH AX
+            IN AL, PA
+            OR AL, 02H
+            OUT PA, AL  
+            POP AX
+            RET
+            
+ INT_SETUP: PUSH AX
+            CLI
+            MOV AL, 0FEH
+            OUT IMR, AL
+            
+            MOV AL, 10
+            OUT INT0, AL
+            STI
+            POP AX
+            RET
+            
+ORG 2000h
+            CALL INT_SETUP
+            CALL PIO_SETUP
+            
+            MOV BX, OFFSET MSJ
+            MOV AL, OFFSET FIN - OFFSET MSJ
+            INT 7
+            
+            MOV BX, OFFSET STR
+            MOV CL, 0
+            
+  LOOP:     INT 6
+            INC CL
+            INC BX
+            JMP LOOP
+            
+INT 0
+END

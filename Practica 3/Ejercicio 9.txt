@@ -1,0 +1,82 @@
+HSK EQU 40H
+
+PIC EQU 20H
+
+INT0 EQU 24H
+
+INT2 EQU 26H
+
+ORG 40
+ DW GEST_F10
+
+ORG 44
+ DW GEST_HS
+ 
+ORG 1500H
+ STR DB ?
+ 
+ 
+ORG 3000H
+ 
+ GEST_F10: PUSH AX
+          
+          IN AL, PIC+1
+          XOR AL, 4
+          OUT PIC+1, AL
+          
+          MOV AL, 20H
+          OUT PIC, AL
+          
+          POP AX
+          IRET 
+
+ GEST_HS: PUSH AX
+          
+          MOV BX, OFFSET STR
+          
+BUCLE:    MOV AL, [BX]
+          OUT HSK, AL
+          INC BX
+          DEC CL
+          JNZ BUCLE
+          
+          MOV AL, 0FEH
+          OUT PIC +1 , AL
+          
+          MOV CL, 0 
+          MOV BX, OFFSET STR
+          
+          MOV AL, 20H
+          OUT PIC, AL
+          
+          POP AX
+          IRET
+          
+ SETUP: PUSH AX
+        CLI
+        MOV AL, 0FEH
+        OUT PIC + 1, AL
+         
+        MOV AL, 10
+        OUT INT0, AL
+        
+        MOV AL, 11
+        OUT INT2, AL
+         
+        IN  AL, HSK +1
+        OR  AL, 80H
+        OUT HSK + 1, AL
+        STI
+        POP AX
+        RET
+
+ORG 2000H
+        CALL SETUP
+        MOV CL, 0
+        MOV BX, OFFSET STR
+LOOP:   INT 6
+        INC CL
+        INC BX
+        JMP LOOP
+HLT
+END

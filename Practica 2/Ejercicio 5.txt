@@ -1,0 +1,51 @@
+ORG 1000H
+  MSJ DB "INGRESE UN NUMERO:"
+  MSJ2 DB "CARACTER NO VALIDO"
+  MSJ3 DB "CARACTER VALIDO"
+  FIN DB 3AH
+ORG 1500H
+  NUM DB ?
+
+ORG 3000H
+  ES_NUM: MOV CL, 30H
+   BUCLE: MOV DL, [BX]
+          CMP DL, CL
+          JZ SI_ES
+          INC CL
+          CMP CL, 3AH
+          JZ NO_ES
+          JMP BUCLE
+      
+     SI_ES: MOV BX, OFFSET MSJ3
+            MOV AL, OFFSET FIN - OFFSET MSJ3
+            INT 7
+            MOV AL, 0FFH
+            RET
+     
+     NO_ES: MOV BX, OFFSET MSJ2
+            MOV AL, OFFSET MSJ3 - OFFSET MSJ2
+            INT 7
+            MOV AL, 00H
+            RET
+            
+  
+ORG 2000H
+  MOV BX, OFFSET MSJ
+  MOV AL, OFFSET MSJ2-OFFSET MSJ
+  INT 7 ;imprime le mensaje
+  
+  MOV BX, OFFSET NUM ;mueve a bx la direccion de la variable donde se va a guardar el numero leido por teclado
+  INT 6 ;llama a la interrupcion de lectura
+
+  PUSH BX
+  PUSH CX
+  PUSH DX
+  
+  CALL ES_NUM
+
+  POP DX
+  POP CX
+  POP BX
+
+INT 0
+END

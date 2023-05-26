@@ -1,0 +1,54 @@
+TIMER EQU 10H
+PIC EQU 20H
+EOI EQU 20H
+N_CLK EQU 10
+
+ORG 40
+ IP_CLK DW RUT_CLK
+
+ORG 1000H
+ SEG DB 30H
+ SEG1 DB 30H
+ DB 0AH
+ FIN DB ?
+
+ORG 3000H
+RUT_CLK: PUSH AX
+ INC SEG1
+ CMP SEG1, 3AH
+ JNZ RESET
+ MOV SEG1, 30H
+ INC SEG
+ CMP SEG, 36H
+ JNZ RESET
+ MOV SEG, 30H
+ RESET: INT 7
+ MOV AL, 0
+ OUT TIMER, AL
+ MOV AL, EOI
+ OUT PIC, AL
+ POP AX
+ IRET
+
+ORG 2000H
+ CLI
+ MOV AL, 0FDH
+ OUT PIC+1, AL ; PIC: registro IMR
+ MOV AL, N_CLK
+ OUT PIC+5, AL ; PIC: registro INT1
+ MOV AL, 1
+ OUT TIMER+1, AL ; TIMER: registro COMP
+ MOV AL, 0
+ OUT TIMER, AL ; TIMER: registro CONT
+ MOV BX, OFFSET SEG
+ MOV AL, OFFSET FIN-OFFSET SEG
+ STI
+ LAZO: JMP LAZO
+END
+
+Explicar detalladamente:
+a) Cómo funciona el TIMER y cuándo emite una interrupción a la CPU.
+El timer dunciona generando interrupciones periodicamente. En su registro COMP se carga un modulo y su registro CONT es un conttador, cada vez que el contador llega a ese moodulo, el timer emite una interrupcion. 
+
+b) La función que cumplen sus registros, la dirección de cada uno y cómo se programan.
+El timer tiene 2 registros COMP y CONT, cuyas funciones ya describi en el punto anterior. INT1 es un registro del PIC que almacena la direccion a la rutina correspondiente a la interrupcion del timer (en realidad tiene una id que hace referencia a una posicion en el vector de interrupciones en donde si se encuentra dicha direccion a la rutina correspondiente).

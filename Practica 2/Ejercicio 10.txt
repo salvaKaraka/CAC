@@ -1,0 +1,40 @@
+PIC EQU 20H
+EOI EQU 20H
+N_F10 EQU 10
+ORG 40
+  IP_F10 DW RUT_F10
+
+ORG 2000H
+  CLI
+  MOV AL, 0FEH
+  OUT PIC+1, AL ; PIC: registro IMR
+  MOV AL, N_F10
+  OUT PIC+4, AL ; PIC: registro INT0
+  MOV DX, 0
+  STI
+LAZO: JMP LAZO
+
+ORG 3000H
+  RUT_F10: PUSH AX
+  INC DX
+  MOV AL, EOI
+  OUT EOI, AL ; PIC: registro EOI
+  POP AX
+  IRET
+END
+
+
+a) La función de los registros del PIC: ISR, IRR, IMR, INT0-INT7, EOI. Indicar la dirección de cada uno.
+
+ISR:Es el registro de servicio de interrupcion, lo que hace es recibir el bit asociado al generador de interupcion enviado por el IRR y coloca ene el bus de datos el identificador asociado al registro de la interrupcion correspondiente. Se ubica en la dir 23H
+IRR:Es el registro de peticion de interrupcion, su funcion es la de almacenar las peticiones de interrupcion poniendo a 1 su bit correspondiente. Su direccion es la 22H
+IMR:Es el registroo de mascara de interrupcion, sirve para enmascarar las interrupciones y asi tener control de cuales van a poder ser ejecutadas y cuales no. Las interrupciones que no queremos que se procesen son enmascaradas poniendo a 1 su bit correspondiente.
+INT0-INT7:Es el vector de registros de interrupcion, se ubica de la poscion 24H a la 2BH, cada registro es probgramable y corresponde a una interrupcion especifica, su tamano des de 1byte.
+EOI: Es el registro de comando del controlador. Cumple multiples funciones, pero lo utilizamos para dar fin a una interrupcion. se encuentra en 20H
+
+
+b) Cuáles de estos registros son programables y cómo trabaja la instrucción OUT.
+Los registros programables son INT0..7 e IMR. OUT escribe en un registro E/S.
+
+c) Qué hacen y para qué se usan las instrucciones CLI y STI.
+CLI y STI se ultilizan para deshabilitar y habilitar las interrupciones respectivamente.
