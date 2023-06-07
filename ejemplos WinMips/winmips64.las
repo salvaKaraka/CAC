@@ -1,0 +1,1 @@
+D:\.INGENIERIA EN COMPUTACION\2023\CAC\ejemplos WinMips\Ej3-Teo.s

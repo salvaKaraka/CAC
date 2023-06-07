@@ -18,7 +18,7 @@ B: .word 2
 	
 ; - ¿Qué tipo de ‘stall’ es el que aparece?
 
-;	es un stall por dependencia de datos de tipo RAW (dependencia verdadera)
+;	es un stall por dependencia de datos de tipo RAW (read after write)
 
 ;- ¿Cuál es el promedio de Ciclos Por Instrucción (CPI) en la ejecución de este programa bajo esta configuración?
 
