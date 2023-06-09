@@ -11,3 +11,17 @@ cant: .word 0 ; cantidad de veces que se repite el caracter car en cadena.
 
 .code
 main:
+    lbu r3, cadena(r0)
+    lbu r4, car(r0)
+    daddi r2, r0 , 0
+    daddi r1, r0 , 0
+
+loop: 
+    bne r3, r4, next
+    daddi r1, r1, 1
+    daddi r2, r2, 1
+next:
+    bnez r3, loop
+    lbu r3, cadena(r1)
+    sd r2, cant(r0)
+halt
