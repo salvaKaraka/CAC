@@ -1,0 +1,14 @@
+Registros  | Nombres | Uso                                                         | ¿Preservado?
+-----------|---------|-------------------------------------------------------------|--------------
+r0         | $zero   | Constante cero                                              | No
+r1         | $at     | Reservado para el ensamblador (assembler temporary)          | No
+r2-r3      | $v0-$v1 | Valores de retorno de una función                            | Sí
+r4-r7      | $a0-$a3 | Argumentos de una función (parámetros)                        | No
+r8-r15     | $t0-$t7 | Registros temporales                                        | No
+r16-r23    | $s0-$s7 | Registros salvados (preservados)                              | Sí
+r24-r25    | $t8-$t9 | Registros temporales                                        | No
+r26-r27    | $k0-$k1 | Registros reservados para uso del sistema operativo (kernel) | Sí
+r28        | $gp     | Puntero global (global pointer)                              | Sí
+r29        | $sp     | Puntero de pila (stack pointer)                              | Sí
+r30        | $fp     | Puntero de marco (frame pointer)                             | Sí
+r31        | $ra     | Registro de retorno (return address)                         | Sí
