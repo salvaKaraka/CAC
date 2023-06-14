@@ -1,1 +1,1 @@
-G:\Otros ordenadores\Mi PC\.INGENIERIA EN COMPUTACION\2023\CAC\Practica 6\Ejercicio 1.s
+G:\Otros ordenadores\Mi PC\.INGENIERIA EN COMPUTACION\2023\CAC\Practica 6\Ejercicio 9.s
